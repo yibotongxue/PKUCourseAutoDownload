@@ -1,0 +1,5 @@
+{
+    "url": "https://example.com",
+    "cookieFile": "./cookie.txt",
+    "downloadFolder": "./example"
+}
