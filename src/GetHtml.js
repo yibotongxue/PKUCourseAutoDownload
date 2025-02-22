@@ -1,5 +1,4 @@
 import puppeteer from 'puppeteer';
-import { readFileSync } from 'fs';
 
 /**
  * 
