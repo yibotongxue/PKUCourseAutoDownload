@@ -1,10 +1,6 @@
 import puppeteer from 'puppeteer';
 
-/**
- * 
- * @param {Array} cookie 网页的 cookie ，以登陆网页
- * @param {string} url 网页的链接
- */
+
 export default async function getHtml(cookie, url) {
     const browser = await puppeteer.launch({
         args: [

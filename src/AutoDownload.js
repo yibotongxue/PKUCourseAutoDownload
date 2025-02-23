@@ -6,14 +6,16 @@ import downloadFile from "./DownloadFile.js";
 
 async function autoDownload(cookieFile, url, downloadFolder, patterns) {
 
-    const cookies = await parseCookieFile(cookieFile);
+    const cookies = parseCookieFile(cookieFile);
     const text = await getHtml(cookies, url);
     let results = [];
     for (const pattern of patterns) {
         results = [...results, ...text.matchAll(pattern)];
     }
     const prefixUrl = "https://course.pku.edu.cn";
-
+    if (!fs.existsSync(downloadFolder)) {
+        fs.mkdirSync(downloadFolder);
+    }
     for (const result of results) {
         const fullUrl = prefixUrl + result[1];
         let fileName = result[3];
@@ -23,10 +25,7 @@ async function autoDownload(cookieFile, url, downloadFolder, patterns) {
         if (!fileName.includes(".")) {
             fileName = fileName + ".pdf";
         }
-        if (!fs.existsSync(downloadFolder)) {
-            fs.mkdirSync(downloadFolder);
-        }
-        const downloadPath = path.join(downloadFolder, fileName);
+        const downloadPath = path.join(path.resolve(downloadFolder), fileName);
         await downloadFile(fullUrl, downloadPath, cookies);
     }
 }
