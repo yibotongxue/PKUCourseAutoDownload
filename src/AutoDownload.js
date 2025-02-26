@@ -4,7 +4,7 @@ import parseCookieFile from "./ParseCookieFile.js";
 import getHtml from "./GetHtml.js";
 import downloadFile from "./DownloadFile.js";
 
-async function autoDownload(cookieFile, url, downloadFolder, patterns) {
+async function autoDownload(cookieFile, url, downloadFolder, patterns, incremental) {
 
     const cookies = parseCookieFile(cookieFile);
     const text = await getHtml(cookies, url);
@@ -26,6 +26,10 @@ async function autoDownload(cookieFile, url, downloadFolder, patterns) {
             fileName = fileName + ".pdf";
         }
         const downloadPath = path.join(path.resolve(downloadFolder), fileName);
+        if (incremental && fs.existsSync(downloadPath)) {
+            console.log("文件已存在，跳过：" + fileName);
+            continue;
+        }
         await downloadFile(fullUrl, downloadPath, cookies);
     }
 }
@@ -51,7 +55,7 @@ for (const arg of args) {
         const config = JSON.parse(configFileContent); // 解析 JSON 数据
 
         // 3. 提取配置参数
-        const { url, cookieFile, downloadFolder } = config;
+        const { url, cookieFile, downloadFolder, incremental } = config;
 
         // 检查是否包含必要的参数
         if (!url || !cookieFile || !downloadFolder) {
@@ -59,7 +63,11 @@ for (const arg of args) {
             process.exit(1);
         }
 
-        autoDownload(cookieFile, url, downloadFolder, patterns).then(() => {
+        if (!incremental) {
+            incremental = false;
+        }
+
+        autoDownload(cookieFile, url, downloadFolder, patterns, incremental).then(() => {
             console.log("下载完成");
         }).catch((error) => {
             console.log("下载失败：", error);

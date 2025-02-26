@@ -47,7 +47,7 @@ npm i
 
 ## 配置文件
 
-在 [config](./config/) 目录中创建配置文件（其他位置也可以），配置文件类型为 JSON 文件，我们给出了一个示例配置文件 [example.json](./config/example.json) ，可以拷贝修改之，需要指定的包括**教学内容**网页的链接（注意是你想要下载的课程的教学内容网页的链接，不是教学网首页的链接），上一步中你的 Cookie 保存的文件的路径，以及你希望下载的文件目录的路径。
+在 [config](./config/) 目录中创建配置文件（其他位置也可以），配置文件类型为 JSON 文件，我们给出了一个示例配置文件 [example.json](./config/example.json) ，可以拷贝修改之，需要指定的包括**教学内容**网页的链接（注意是你想要下载的课程的教学内容网页的链接，不是教学网首页的链接），上一步中你的 Cookie 保存的文件的路径，以及你希望下载的文件目录的路径。可以选择性地配置 `incremental` 字段，默认值为 `false` ，如果设置为 `true` ，则会在每次运行时检查上次下载的文件，只下载新增的文件，而不是全部下载，这可以避免重复下载，但**不会检查讲义是否有更新**，只是检查文件是否存在。
 
 ## 运行
 
@@ -61,4 +61,16 @@ npm run download <配置文件路径>
 
 ```bash
 npm run download ./example.json
+```
+
+可以同时给出多个配置文件，比如
+
+```bash
+npm run download ./example.json ./example2.json
+```
+
+或者
+
+```bash
+npm run download./config/*.json
 ```
