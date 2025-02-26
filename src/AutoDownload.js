@@ -55,7 +55,8 @@ for (const arg of args) {
         const config = JSON.parse(configFileContent); // 解析 JSON 数据
 
         // 3. 提取配置参数
-        const { url, cookieFile, downloadFolder, incremental } = config;
+        const { url, cookieFile, downloadFolder } = config;
+        let incremental = config.incremental;
 
         // 检查是否包含必要的参数
         if (!url || !cookieFile || !downloadFolder) {
