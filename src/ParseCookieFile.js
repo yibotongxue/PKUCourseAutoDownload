@@ -1,10 +1,5 @@
 import { readFileSync } from 'fs';
 
-/**
- * 
- * @param {string} cookieFile 
- * @returns JSON
- */
 export default function parseCookieFile(cookieFile) {
     const cookieStr = readFileSync(cookieFile).toString();
     // console.log(cookieStr);

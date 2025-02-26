@@ -37,36 +37,36 @@ const patterns = [
 
 // 1. 从命令行参数中获取配置文件路径
 const args = process.argv.slice(2); // 获取用户传递的参数
-const configFilePath = args[0]; // 假设第一个参数是配置文件路径
-
-// 检查是否传入了配置文件路径
-if (!configFilePath) {
-    console.error("请传入配置文件路径，例如：node script.js path/to/config.json");
-    process.exit(1); // 退出程序
+if (args.length === 0) {
+    console.error("请提供配置文件路径作为命令行参数");
+    process.exit(1);
 }
+for (const arg of args) {
+    const configFilePath = path.resolve(arg);
 
-// 2. 读取并解析 JSON 配置文件
-try {
-    // 读取文件内容
-    const configFileContent = fs.readFileSync(configFilePath, 'utf-8');
-    const config = JSON.parse(configFileContent); // 解析 JSON 数据
+    // 2. 读取并解析 JSON 配置文件
+    try {
+        // 读取文件内容
+        const configFileContent = fs.readFileSync(configFilePath, 'utf-8');
+        const config = JSON.parse(configFileContent); // 解析 JSON 数据
 
-    // 3. 提取配置参数
-    const { url, cookieFile, downloadFolder } = config;
+        // 3. 提取配置参数
+        const { url, cookieFile, downloadFolder } = config;
 
-    // 检查是否包含必要的参数
-    if (!url || !cookieFile || !downloadFolder) {
-        console.error("配置文件中缺少必要的参数（url, cookieFile, downloadFolder）");
+        // 检查是否包含必要的参数
+        if (!url || !cookieFile || !downloadFolder) {
+            console.error("配置文件中缺少必要的参数（url, cookieFile, downloadFolder）");
+            process.exit(1);
+        }
+
+        autoDownload(cookieFile, url, downloadFolder, patterns).then(() => {
+            console.log("下载完成");
+        }).catch((error) => {
+            console.log("下载失败：", error);
+        })
+
+    } catch (error) {
+        console.error("读取或解析配置文件时出错：", error.message);
         process.exit(1);
     }
-
-    autoDownload(cookieFile, url, downloadFolder, patterns).then(() => {
-        console.log("下载完成");
-    }).catch((error) => {
-        console.log("下载失败：", error);
-    })
-
-} catch (error) {
-    console.error("读取或解析配置文件时出错：", error.message);
-    process.exit(1);
 }
