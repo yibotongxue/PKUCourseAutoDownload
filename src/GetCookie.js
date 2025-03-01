@@ -2,6 +2,10 @@ import puppeteer from "puppeteer";
 import { writeFileSync } from "fs";
 
 export default async function getCookie(userName, password, cookieFile) {
+    if (userName === "" || password === "") {
+        writeFileSync(cookieFile, "");
+        return [];
+    }
     const browser = await puppeteer.launch({
         args: [
             "--no-sandbox",
