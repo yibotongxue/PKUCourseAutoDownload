@@ -6,6 +6,6 @@
     "puppeteer": "^24.2.1"
   },
   "scripts": {
-    "download": "node src/AutoDownload.js"
+    "download": "node src/main.js"
   }
 }
