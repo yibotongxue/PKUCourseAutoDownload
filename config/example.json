@@ -1,6 +1,6 @@
 {
     "url": "https://example.com",
-    "cookieFile": "./cookie.txt",
+    "cookieFile": "./cookie.json",
     "downloadFolder": "./example",
     "incremental": true
 }

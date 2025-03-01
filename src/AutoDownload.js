@@ -3,14 +3,36 @@ import fs from 'fs';
 import parseCookieFile from "./ParseCookieFile.js";
 import getHtml from "./GetHtml.js";
 import downloadFile from "./DownloadFile.js";
+import getCookie from "./GetCookie.js";
 
-export default async function autoDownload(cookieFile, url, downloadFolder, patterns, incremental) {
-
-    const cookies = parseCookieFile(cookieFile);
+async function getLinks(cookies, url, patterns) {
     const text = await getHtml(cookies, url);
     let results = [];
     for (const pattern of patterns) {
         results = [...results, ...text.matchAll(pattern)];
+    }
+    return results;
+}
+
+export default async function autoDownload(cookieFile, url, downloadFolder, patterns, incremental) {
+    let cookies = null;
+    let newestCookie = false;
+    if (!fs.existsSync(cookieFile)) {
+        console.log("Cookie文件找不到，尝试重新获取");
+        const infoContent = fs.readFileSync('./config/info.json', 'utf-8');
+        const { userName, password } = JSON.parse(infoContent);
+        cookies = await getCookie(userName, password, cookieFile);
+        newestCookie = true;
+    } else {
+        cookies = parseCookieFile(cookieFile);
+    }
+    let results = await getLinks(cookies, url, patterns);
+    if (results.length === 0 && !newestCookie) {
+        console.log("找不到文件，尝试重新获取 Cookie");
+        const infoContent = fs.readFileSync('./config/info.json', 'utf-8');
+        const { userName, password } = JSON.parse(infoContent);
+        cookies = await getCookie(userName, password, cookieFile);
+        results = await getLinks(cookieFile, url, patterns);
     }
     const prefixUrl = "https://course.pku.edu.cn";
     if (!fs.existsSync(downloadFolder)) {
