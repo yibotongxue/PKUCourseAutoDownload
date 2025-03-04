@@ -31,6 +31,5 @@ export default async function getCookie(userName, password, cookieFile) {
     await browser.close();
     cookies = cookies.filter(cookie => cookie.domain === 'course.pku.edu.cn');
     writeFileSync(cookieFile, JSON.stringify(cookies, null, 2));
-    console.log(cookies);
     return cookies;
 }
