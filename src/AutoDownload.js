@@ -32,7 +32,7 @@ export default async function autoDownload(cookieFile, url, downloadFolder, patt
         const infoContent = fs.readFileSync('./config/info.json', 'utf-8');
         const { userName, password } = JSON.parse(infoContent);
         cookies = await getCookie(userName, password, cookieFile);
-        results = await getLinks(cookieFile, url, patterns);
+        results = await getLinks(cookies, url, patterns);
     }
     const prefixUrl = "https://course.pku.edu.cn";
     if (!fs.existsSync(downloadFolder)) {

@@ -1,6 +1,10 @@
 import puppeteer from "puppeteer";
 import { writeFileSync } from "fs";
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+}
+
 export default async function getCookie(userName, password, cookieFile) {
     if (userName === "" || password === "") {
         writeFileSync(cookieFile, "");
@@ -16,8 +20,10 @@ export default async function getCookie(userName, password, cookieFile) {
     await page.goto(courseUrl, { waitUntil: 'networkidle0' });
     await page.waitForSelector('input[type="text"]', { visible: true });
     await page.type('input[type="text"]', userName);
+    await sleep(1000);
     await page.waitForSelector('input[type="password"]', { visible: true });
     await page.type('input[type="password"]', password);
+    await sleep(1000);
     await page.waitForSelector('input[type="submit"]', { visible: true });
     await page.click('input[type="submit"]');
     await page.waitForNavigation({ waitUntil: 'networkidle0' });
@@ -25,5 +31,6 @@ export default async function getCookie(userName, password, cookieFile) {
     await browser.close();
     cookies = cookies.filter(cookie => cookie.domain === 'course.pku.edu.cn');
     writeFileSync(cookieFile, JSON.stringify(cookies, null, 2));
+    console.log(cookies);
     return cookies;
 }
