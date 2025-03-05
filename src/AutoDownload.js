@@ -39,11 +39,12 @@ const mimeTypeToExtension = {
     'application/vnd.ms-powerpoint': '.ppt',
     'application/vnd.openxmlformats-officedocument.presentationml.presentation': '.pptx',
     'application/x-rar': '.rar',
+    'application/zip': '.zip',
 };
 
 // 由腾讯元宝辅助编写
 function addExtension(fileName) {
-    if (fileName.includes(".")) {
+    if (fileName.split("/")[fileName.split("/").length - 1].includes(".")) {
         return;
     }
     exec(`file --mime-type -b "${fileName}"`, (error, stdout, stderr) => {
@@ -99,7 +100,7 @@ export default async function autoDownload(cookieFile, url, downloadFolder, file
     if (!fs.existsSync(downloadFolder)) {
         fs.mkdirSync(downloadFolder);
     }
-    for (const result of results) {
+    outerLoop: for (const result of results) {
         const fullUrl = prefixUrl + result[0][1];
         let fileName = result[0][3];
         if (fileName.startsWith("&nbsp;")) {
@@ -109,9 +110,17 @@ export default async function autoDownload(cookieFile, url, downloadFolder, file
             fs.mkdirSync(result[1]);
         }
         const downloadPath = path.join(path.resolve(result[1]), fileName);
-        if (incremental && fs.existsSync(downloadPath)) {
-            console.log("文件已存在，跳过：" + fileName);
-            continue;
+        if (incremental) {
+            if (fs.existsSync(downloadPath)) {
+                console.log("文件已存在，跳过：" + fileName);
+                continue;
+            }
+            for (const extension of Object.values(mimeTypeToExtension)) {
+                if (fs.existsSync(downloadPath + extension)) {
+                    console.log("文件已存在，跳过：" + fileName);
+                    continue outerLoop;
+                }
+            }
         }
         await downloadFile(fullUrl, downloadPath, cookies);
         addExtension(downloadPath);
