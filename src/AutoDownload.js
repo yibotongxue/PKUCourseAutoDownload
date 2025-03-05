@@ -1,9 +1,9 @@
 import path from "path";
 import fs from 'fs';
-import { exec } from "child_process";
 import parseCookieFile from "./ParseCookieFile.js";
 import getHtml from "./GetHtml.js";
 import downloadFile from "./DownloadFile.js";
+import getExtensionFromRemote from "./GetExtension.js";
 import getCookie from "./GetCookie.js";
 
 const prefixUrl = "https://course.pku.edu.cn";
@@ -24,57 +24,6 @@ async function getLinks(cookies, url, filePatterns, folderPatterns, baseFolder) 
         results = [...results, ...await getLinks(cookies, folder[0], filePatterns, folderPatterns, path.join(baseFolder, folder[1]))];
     }
     return results;
-}
-
-// 由腾讯元宝辅助编写
-const mimeTypeToExtension = {
-    'text/plain': '.txt',
-    'image/jpeg': '.jpg',
-    'image/png': '.png',
-    'application/pdf': '.pdf',
-    'application/msword': '.doc',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx',
-    'application/vnd.ms-excel': '.xls',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': '.xlsx',
-    'application/vnd.ms-powerpoint': '.ppt',
-    'application/vnd.openxmlformats-officedocument.presentationml.presentation': '.pptx',
-    'application/x-rar': '.rar',
-    'application/zip': '.zip',
-};
-
-// 由腾讯元宝辅助编写
-function addExtension(fileName) {
-    if (fileName.split("/")[fileName.split("/").length - 1].includes(".")) {
-        return;
-    }
-    exec(`file --mime-type -b "${fileName}"`, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`执行命令时出错: ${error.message}`);
-            return;
-        }
-
-        if (stderr) {
-            console.error(`命令输出错误: ${stderr}`);
-            return;
-        }
-
-        const mimeType = stdout.trim();
-        const extension = mimeTypeToExtension[mimeType];
-
-        if (!extension) {
-            console.log(`未知的文件类型: ${mimeType}`);
-            return;
-        }
-
-        const newFileName = `${fileName}${extension}`;
-        fs.rename(fileName, newFileName, (err) => {
-            if (err) {
-                console.error(`重命名文件时出错: ${err.message}`);
-                return;
-            }
-            console.log(`已将 '${fileName}' 重命名为 '${newFileName}'`);
-        });
-    });
 }
 
 export default async function autoDownload(cookieFile, url, downloadFolder, filePatterns, folderPatterns, incremental) {
@@ -109,20 +58,16 @@ export default async function autoDownload(cookieFile, url, downloadFolder, file
         if (!fs.existsSync(result[1])) {
             fs.mkdirSync(result[1]);
         }
+        const extension = await getExtensionFromRemote(fullUrl, cookies);
+        if (extension && !path.extname(fileName)) {
+            fileName += '.' + extension.ext;
+        }
         const downloadPath = path.join(path.resolve(result[1]), fileName);
-        if (incremental) {
-            if (fs.existsSync(downloadPath)) {
-                console.log("文件已存在，跳过：" + fileName);
-                continue;
-            }
-            for (const extension of Object.values(mimeTypeToExtension)) {
-                if (fs.existsSync(downloadPath + extension)) {
-                    console.log("文件已存在，跳过：" + fileName);
-                    continue outerLoop;
-                }
-            }
+        if (incremental && fs.existsSync(downloadPath)) {
+            console.log("文件已存在，跳过：", downloadPath);
+            continue;
         }
         await downloadFile(fullUrl, downloadPath, cookies);
-        addExtension(downloadPath);
+        // addExtension(downloadPath);
     }
 }
