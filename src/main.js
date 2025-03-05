@@ -2,10 +2,14 @@ import path from "path";
 import fs from 'fs';
 import autoDownload from "./AutoDownload.js";
 
-const patterns = [
+const filePatterns = [
     /(?<=href=")(.+?xid.+?)(?=")(.+?)>([^<]+?)(?=<\/a>)/g,
     /(?<=href=")(.+?xid.+?)(?=")(.+?)>([^<]+?)(?=<\/span><\/a>)/g
 ];
+
+const folderPatterns = [
+    /(?<=href=")(.+?listContent\.jsp\?course_id=[0-9_]+?&amp;content_id=[0-9_]+?)"><span style="color:#000000;">(.+?)<\/span>/g,
+]
 
 // 1. 从命令行参数中获取配置文件路径
 const args = process.argv.slice(2); // 获取用户传递的参数
@@ -36,7 +40,7 @@ for (const arg of args) {
             incremental = false;
         }
 
-        await autoDownload(cookieFile, url, downloadFolder, patterns, incremental).then(() => {
+        await autoDownload(cookieFile, url, downloadFolder, filePatterns, folderPatterns, incremental).then(() => {
             console.log("下载完成");
         }).catch((error) => {
             console.log("下载失败：", error);
