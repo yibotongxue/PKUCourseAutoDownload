@@ -6,6 +6,7 @@ export default function parseCookieFile(cookieFile) {
     try {
         cookies = JSON.parse(cookieStr);
     } catch(error) {
+        cookies = [];
         const ca = cookieStr.split(';');
         for (let i = 0; i < ca.length; i++) {
             let c = ca[i].trim();
