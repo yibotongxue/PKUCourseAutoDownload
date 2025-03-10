@@ -3,7 +3,7 @@ import fs from 'fs';
 import parseCookieFile from "./ParseCookieFile.js";
 import getHtml from "./GetHtml.js";
 import downloadFile from "./DownloadFile.js";
-import {getExtensionFromRemote, getExtensionFromFile } from "./GetExtension.js";
+import { getExtensionFromRemote, getExtensionFromFile } from "./GetExtension.js";
 import getCookie from "./GetCookie.js";
 
 const prefixUrl = "https://course.pku.edu.cn";

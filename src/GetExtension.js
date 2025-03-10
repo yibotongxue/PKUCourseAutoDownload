@@ -1,6 +1,6 @@
 import axios from "axios";
 import { fileTypeFromBuffer } from 'file-type';
-import {readChunk} from 'read-chunk';
+import { readChunk } from 'read-chunk';
 import { statSync } from "fs";
 
 export async function getExtensionFromRemote(fileUrl, cookies) {
@@ -54,7 +54,7 @@ async function checkOfficeType(buffer) {
         const JSZip = require('jszip');
         const zip = await JSZip.loadAsync(buffer);
         const hasContentTypes = zip.file('[Content_Types].xml') !== null;
-        
+
         if (hasContentTypes) {
             // 进一步检查文档类型
             const rels = zip.file('_rels/.rels');
