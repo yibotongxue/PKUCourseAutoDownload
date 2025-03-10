@@ -3,7 +3,7 @@ import fs from 'fs';
 import parseCookieFile from "./ParseCookieFile.js";
 import getHtml from "./GetHtml.js";
 import downloadFile from "./DownloadFile.js";
-import getExtensionFromRemote from "./GetExtension.js";
+import {getExtensionFromRemote, getExtensionFromFile } from "./GetExtension.js";
 import getCookie from "./GetCookie.js";
 
 const prefixUrl = "https://course.pku.edu.cn";
@@ -59,7 +59,10 @@ export default async function autoDownload(cookieFile, url, downloadFolder, file
             fs.mkdirSync(result[1]);
         }
         const extension = await getExtensionFromRemote(fullUrl, cookies);
-        if (extension && !path.extname(fileName)) {
+        let needParseExtension = false;
+        if (extension.mime === 'application/zip') {
+            needParseExtension = true;
+        } else if (extension && !path.extname(fileName)) {
             fileName += '.' + extension.ext;
         }
         const downloadPath = path.join(path.resolve(result[1]), fileName);
@@ -68,6 +71,14 @@ export default async function autoDownload(cookieFile, url, downloadFolder, file
             continue;
         }
         await downloadFile(fullUrl, downloadPath, cookies);
+        if (needParseExtension) {
+            const extension = await getExtensionFromFile(downloadPath);
+            if (extension && path.extname(downloadPath) !== `.${extension.ext}`) {
+                const newPath = path.join(path.dirname(downloadPath), `${path.basename(downloadPath, path.extname(downloadPath))}.${extension.ext}`);
+                fs.renameSync(downloadPath, newPath);
+                console.log(`文件重命名为: ${newPath}`);
+            }
+        }
         // addExtension(downloadPath);
     }
 }

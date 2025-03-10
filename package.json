@@ -4,6 +4,7 @@
     "axios": "^1.7.9",
     "file-type": "^20.4.0",
     "fs": "^0.0.1-security",
+    "jszip": "^3.10.1",
     "puppeteer": "^24.2.1",
     "read-chunk": "^5.0.0"
   },
