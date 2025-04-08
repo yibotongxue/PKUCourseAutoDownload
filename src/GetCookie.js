@@ -19,9 +19,11 @@ export default async function getCookie(userName, password, cookieFile) {
     const page = await browser.newPage();
     await page.goto(courseUrl, { waitUntil: 'networkidle0' });
     await page.waitForSelector('input[type="text"]', { visible: true });
+    await sleep(1000);
     await page.type('input[type="text"]', userName);
     await sleep(1000);
     await page.waitForSelector('input[type="password"]', { visible: true });
+    await sleep(1000);
     await page.type('input[type="password"]', password);
     await sleep(1000);
     await page.waitForSelector('input[type="submit"]', { visible: true });

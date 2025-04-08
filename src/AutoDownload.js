@@ -59,10 +59,8 @@ export default async function autoDownload(cookieFile, url, downloadFolder, file
             fs.mkdirSync(result[1]);
         }
         const extension = await getExtensionFromRemote(fullUrl, cookies);
-        let needParseExtension = false;
-        if (extension.mime === 'application/zip') {
-            needParseExtension = true;
-        } else if (extension && !path.extname(fileName)) {
+        let needParseExtension = extension.needRename;
+        if (extension && !needParseExtension && !path.extname(fileName)) {
             fileName += '.' + extension.ext;
         }
         const downloadPath = path.join(path.resolve(result[1]), fileName);
