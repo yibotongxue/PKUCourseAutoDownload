@@ -48,6 +48,7 @@ export async function getExtensionFromRemote(fileUrl, cookies) {
         return type;
     } catch (err) {
         console.error('获取文件头时出错:', err);
+        return { needRename: true };
     }
 }
 

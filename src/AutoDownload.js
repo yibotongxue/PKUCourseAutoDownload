@@ -71,7 +71,7 @@ export default async function autoDownload(cookieFile, url, downloadFolder, file
         await downloadFile(fullUrl, downloadPath, cookies);
         if (needParseExtension) {
             const extension = await getExtensionFromFile(downloadPath);
-            if (extension && path.extname(downloadPath) !== `.${extension.ext}`) {
+            if (extension && path.extname(downloadPath) !== `.${extension.ext}` && (extension.ext !== 'txt' || path.extname(downloadPath) === '')) {
                 const newPath = path.join(path.dirname(downloadPath), `${path.basename(downloadPath, path.extname(downloadPath))}.${extension.ext}`);
                 fs.renameSync(downloadPath, newPath);
                 console.log(`文件重命名为: ${newPath}`);
